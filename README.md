@@ -1,6 +1,8 @@
 # banchor
 
-CLI mission-rail anchor for agentic loops. Reads a task description plus an optional mission anchor; emits a `next-step` directive on stdout naming the typed task class and the anchored mission.
+CLI mission-rail anchor for agentic loops. Reads task class; emits next-step directive.
+
+Anchors a task description against a named or filesystem-rooted mission, classifies the task into a typed `TaskClass`, writes the verdict on stdout, exits with a discriminating code so the calling agent can branch.
 
 ```
 banchor induct <task>             classify a task + emit next-step directive; exit 0 / 1 / 2 / 64
