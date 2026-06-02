@@ -1,0 +1,26 @@
+[package]
+name = "banchor"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "CLI mission-rail anchor for agentic loops. Reads task class; emits next-step directive."
+
+[lib]
+name = "banchor"
+path = "src/lib.rs"
+
+[[bin]]
+name = "banchor"
+path = "src/main.rs"
+
+[dependencies]
+bsuite-core = { git = "https://github.com/bvasilenko/bsuite-core", branch = "main" }
+clap = { version = "4", features = ["derive"] }
+serde = { version = "1", features = ["derive"] }
+thiserror.workspace = true
+
+[dev-dependencies]
+assert_cmd = "2"
+predicates = "3"
+proptest = "1"
