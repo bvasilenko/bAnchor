@@ -8,7 +8,10 @@ fn main() -> ExitCode {
         Ok(cli) => match dispatch_cli(cli) {
             Ok(output) => output.exit_code,
             Err(error) => {
-                eprintln!("{error}");
+                if error.is_reportable() {
+                    eprintln!("{error}");
+                }
+
                 to_process_exit_code(error.exit_code())
             }
         },

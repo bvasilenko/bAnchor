@@ -2,7 +2,7 @@ use std::{path::PathBuf, process::ExitCode};
 
 use clap::{Args, Parser, Subcommand};
 
-use crate::{BanchorError, MissionAnchorRef, TaskClass, induct};
+use crate::{BanchorError, MissionAnchorRef, TaskClass, induct, output};
 
 const PUBLIC_PLACEHOLDER_MESSAGE: &str = "not yet implemented";
 
@@ -51,18 +51,11 @@ pub struct CliOutput {
 pub fn dispatch_cli(cli: BanchorCli) -> Result<CliOutput, BanchorError> {
     let exit_code = match cli.command {
         Cmd::Induct(args) => induct::run(args)?,
-        Cmd::TaskClasses => {
-            print_task_classes();
-            ExitCode::SUCCESS
-        }
-        // Deferred until the bsuite-core package exposes update wiring.
-        Cmd::Update => placeholder("update"),
-        // Deferred until the bsuite-core package exposes init wiring.
-        Cmd::Init => placeholder("init"),
-        // Deferred until the bsuite-core package exposes tail wiring.
-        Cmd::Tail => placeholder("tail"),
-        // Deferred until the bsuite-core package exposes explain wiring.
-        Cmd::Explain => placeholder("explain"),
+        Cmd::TaskClasses => print_task_classes()?,
+        Cmd::Update => placeholder("update")?,
+        Cmd::Init => placeholder("init")?,
+        Cmd::Tail => placeholder("tail")?,
+        Cmd::Explain => placeholder("explain")?,
     };
 
     Ok(CliOutput { exit_code })
@@ -80,13 +73,14 @@ pub fn parse_evidence_pair(value: &str) -> Result<(String, String), String> {
     Ok((key.to_owned(), value.to_owned()))
 }
 
-fn print_task_classes() {
-    for task_class in TaskClass::ALL {
-        println!("{task_class}");
-    }
+fn print_task_classes() -> Result<ExitCode, BanchorError> {
+    output::write_stdout_lines(TaskClass::ALL)?;
+
+    Ok(ExitCode::SUCCESS)
 }
 
-fn placeholder(command_name: &'static str) -> ExitCode {
-    println!("{PUBLIC_PLACEHOLDER_MESSAGE}: {command_name}");
-    ExitCode::SUCCESS
+fn placeholder(command_name: &'static str) -> Result<ExitCode, BanchorError> {
+    output::write_stdout_text(format_args!("{PUBLIC_PLACEHOLDER_MESSAGE}: {command_name}"))?;
+
+    Ok(ExitCode::SUCCESS)
 }

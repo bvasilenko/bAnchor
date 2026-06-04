@@ -1,3 +1,5 @@
+use std::io;
+
 use thiserror::Error;
 
 #[derive(Debug, Error)]
@@ -14,11 +16,27 @@ pub enum BanchorError {
     MalformedEvidence(String),
     #[error("not yet implemented: {0}")]
     NotYetImplemented(&'static str),
+    #[error("stdout write failed: {0}")]
+    Stdout(io::Error),
+    #[error("stdout pipe closed")]
+    BrokenStdoutPipe,
     #[error(transparent)]
     BsuiteCore(#[from] bsuite_core::BsuiteCoreError),
 }
 
 impl BanchorError {
+    pub fn from_stdout_error(error: io::Error) -> Self {
+        if error.kind() == io::ErrorKind::BrokenPipe {
+            return Self::BrokenStdoutPipe;
+        }
+
+        Self::Stdout(error)
+    }
+
+    pub const fn is_reportable(&self) -> bool {
+        !matches!(self, Self::BrokenStdoutPipe)
+    }
+
     pub const fn exit_code(&self) -> bsuite_core::ExitCode {
         match self {
             Self::MalformedTaskDescription(_)
@@ -26,7 +44,8 @@ impl BanchorError {
             | Self::UnknownTaskClass(_)
             | Self::UnknownInductionState(_)
             | Self::MalformedEvidence(_) => bsuite_core::ExitCode::Usage,
-            Self::NotYetImplemented(_) | Self::BsuiteCore(_) => {
+            Self::BrokenStdoutPipe => bsuite_core::ExitCode::Success,
+            Self::NotYetImplemented(_) | Self::BsuiteCore(_) | Self::Stdout(_) => {
                 bsuite_core::ExitCode::InternalError
             }
         }

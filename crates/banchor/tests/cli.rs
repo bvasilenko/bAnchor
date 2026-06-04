@@ -26,8 +26,8 @@ fn assert_induct_evidence_is_accepted(evidence: &str) {
             "bounded skeleton",
         ])
         .assert()
-        .success()
-        .stdout(predicate::str::contains("not yet implemented"));
+        .code(1)
+        .stdout(predicate::str::contains("placeholder directive"));
 }
 
 fn assert_induct_evidence_exits_usage(evidence: &str, message: &str) {

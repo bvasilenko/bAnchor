@@ -2,6 +2,8 @@ mod cli;
 mod error;
 mod induct;
 mod induction_state;
+mod output;
+mod prompt_text;
 mod substrate_input;
 mod taxonomy;
 
