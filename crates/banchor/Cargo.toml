@@ -4,7 +4,7 @@ version.workspace = true
 edition.workspace = true
 license.workspace = true
 repository.workspace = true
-description = "Prompt lookup tool. Agent names a task class from a fixed list of 11; banchor returns the prompt for that task class. The prompt tells the agent how to check the task against a stated mission."
+description = "Prompt lookup tool. Agent names a task class from a fixed list; banchor returns the prompt for that task class. The prompt tells the agent how to check the task against a stated mission."
 
 [lib]
 name = "banchor"

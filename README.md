@@ -1,6 +1,6 @@
 # banchor
 
-Prompt lookup tool. Agent names a task class from a fixed list of 11; banchor returns the prompt for that task class. The prompt tells the agent how to check the task against a stated mission.
+Prompt lookup tool. Agent names a task class from a fixed list; banchor returns the prompt for that task class. The prompt tells the agent how to check the task against a stated mission.
 
 Anchors a task description against a named or filesystem-rooted mission, classifies the task into a typed `TaskClass`, writes the verdict on stdout, exits with a discriminating code so the calling agent can branch.
 
