@@ -17,7 +17,7 @@ if (( ${#files[@]} == 0 )); then
   exit 0
 fi
 
-expected_description="CLI mission-rail anchor for agentic loops. Reads task class; emits next-step directive."
+expected_description="Prompt lookup tool. Agent names a task class from a fixed list of 11; banchor returns the prompt for that task class. The prompt tells the agent how to check the task against a stated mission."
 
 require_fixed_text() {
   local file="$1"
