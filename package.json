@@ -1,0 +1,27 @@
+{
+  "name": "@booga/banchor",
+  "version": "0.1.1",
+  "description": "Prompt lookup tool. Agent names a task class from a fixed list; banchor returns the prompt for that task class. The prompt tells the agent how to check the task against a stated mission.",
+  "bin": {
+    "banchor": "./bin/banchor.js"
+  },
+  "files": [
+    "bin",
+    "LICENSE",
+    "README.md"
+  ],
+  "scripts": {
+    "postinstall": "node ./bin/install.js"
+  },
+  "keywords": [
+    "cli",
+    "agent",
+    "prompt",
+    "lookup"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bvasilenko/bAnchor.git"
+  }
+}
