@@ -1,5 +1,8 @@
 # banchor
 
+For agents that drift mid-task. banchor reads the agent's working session against the mission rail (goals, values, anchors declared at session start) and emits UNANCHORED when the next step would drift away from the stated mission. The task taxonomy is closed (7 classes at v0.1); the prompt library that powers anchoring evolves continuously via empirical-lift evaluation, so the same `banchor induct` invocation gets stricter at catching mission drift as the corpus matures.
+
+
 Prompt lookup tool. Agent names a task class from a fixed list; banchor returns the prompt for that task class. The prompt tells the agent how to check the task against a stated mission.
 
 Anchors a task description against a named or filesystem-rooted mission, classifies the task into a typed `TaskClass`, writes the verdict on stdout, exits with a discriminating code so the calling agent can branch.
