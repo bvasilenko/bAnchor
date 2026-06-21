@@ -115,6 +115,15 @@ fn decode_unicode_escape(characters: &mut std::iter::Peekable<impl Iterator<Item
     char::from_u32(codepoint).unwrap()
 }
 
+fn cli_args_for_task(task: &str) -> Vec<&str> {
+    let mut args = vec!["induct"];
+    if task.starts_with('-') {
+        args.push("--");
+    }
+    args.push(task);
+    args
+}
+
 fn accepted_task_text() -> impl Strategy<Value = String> {
     non_blank_text("task must contain non-whitespace text")
 }
@@ -174,6 +183,33 @@ fn induct_directive_preserves_representative_field_boundaries_losslessly() {
 }
 
 #[test]
+fn induct_directive_accepts_task_values_starting_with_hyphens() {
+    let cases = [
+        "-single-hyphen-prefix",
+        "--double-hyphen-prefix",
+        "--mission",
+        "--json",
+    ];
+
+    for task in cases {
+        assert_directive_fields(&cli_args_for_task(task), task, "none");
+    }
+}
+
+#[test]
+fn induct_directive_accepts_mission_ref_values_starting_with_hyphens() {
+    let cases = ["- ", "-short-ref", "--long-ref", "--json"];
+
+    for mission_ref in cases {
+        assert_directive_fields(
+            &["induct", "ship clean change", "--mission", mission_ref],
+            "ship clean change",
+            mission_ref,
+        );
+    }
+}
+
+#[test]
 fn induct_optional_inputs_do_not_suppress_the_stdout_prompt_contract() {
     let cases: &[(&[&str], &str)] = &[
         (&["induct", "ship clean change", "--quiet"], "none"),
@@ -210,7 +246,8 @@ proptest! {
 
     #[test]
     fn induct_directive_preserves_any_accepted_task_losslessly(task in accepted_task_text()) {
-        assert_directive_fields(&["induct", &task], &task, "none");
+        let args = cli_args_for_task(&task);
+        assert_directive_fields(&args, &task, "none");
     }
 
     #[test]

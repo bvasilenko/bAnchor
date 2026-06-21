@@ -28,8 +28,9 @@ pub enum Cmd {
 
 #[derive(Debug, Clone, Eq, PartialEq, Args)]
 pub struct InductArgs {
+    #[arg(allow_hyphen_values = true)]
     pub task: String,
-    #[arg(long)]
+    #[arg(long, allow_hyphen_values = true)]
     pub mission: Option<MissionAnchorRef>,
     #[arg(long = "evidence", value_parser = parse_evidence_pair)]
     pub evidence: Vec<(String, String)>,
