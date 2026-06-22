@@ -39,6 +39,26 @@ proptest! {
 }
 
 #[test]
+fn task_class_names_are_case_sensitive() {
+    let non_canonical = [
+        "Refactor",
+        "REFACTOR",
+        "BugFix",
+        "Bug-Fix",
+        "BRAND-CONFORM",
+        "Feature",
+        "MIGRATION",
+        "Spike ",
+    ];
+    for name in non_canonical {
+        assert!(
+            TaskClass::from_str(name).is_err(),
+            "non-canonical task class name must be rejected: {name:?}"
+        );
+    }
+}
+
+#[test]
 fn task_class_names_are_unique() {
     let names = TaskClass::ALL
         .into_iter()

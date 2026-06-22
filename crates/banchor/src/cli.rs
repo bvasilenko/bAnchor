@@ -1,10 +1,8 @@
-use std::{path::PathBuf, process::ExitCode};
+use std::path::PathBuf;
 
 use clap::{Args, Parser, Subcommand};
 
-use crate::{BanchorError, MissionAnchorRef, TaskClass, induct, output};
-
-const PUBLIC_PLACEHOLDER_MESSAGE: &str = "not yet implemented";
+use crate::{MissionAnchorRef, TaskClass};
 
 #[derive(Debug, Parser)]
 #[command(name = "banchor")]
@@ -13,7 +11,7 @@ const PUBLIC_PLACEHOLDER_MESSAGE: &str = "not yet implemented";
 )]
 pub struct BanchorCli {
     #[command(subcommand)]
-    pub command: Cmd,
+    pub cmd: Cmd,
 }
 
 #[derive(Debug, Subcommand)]
@@ -28,14 +26,21 @@ pub enum Cmd {
 
 #[derive(Debug, Clone, Eq, PartialEq, Args)]
 pub struct InductArgs {
+    /// Free-form description of the task to anchor.
     #[arg(allow_hyphen_values = true)]
     pub task: String,
+    /// Task class from the closed taxonomy (run `banchor task-classes` to list).
+    #[arg(long = "task-class")]
+    pub task_class: TaskClass,
+    /// Named alias or filesystem path to the mission document.
     #[arg(long, allow_hyphen_values = true)]
     pub mission: Option<MissionAnchorRef>,
+    /// Repeatable key=value evidence pairs.
     #[arg(long = "evidence", value_parser = parse_evidence_pair)]
     pub evidence: Vec<(String, String)>,
     #[arg(long)]
     pub manifest: Option<PathBuf>,
+    /// Emit a JSON envelope instead of plain text.
     #[arg(long)]
     pub json: bool,
     #[arg(long)]
@@ -44,26 +49,8 @@ pub struct InductArgs {
     pub reason: Option<String>,
 }
 
-#[derive(Debug, Clone)]
-pub struct CliOutput {
-    pub exit_code: ExitCode,
-}
-
-pub fn dispatch_cli(cli: BanchorCli) -> Result<CliOutput, BanchorError> {
-    let exit_code = match cli.command {
-        Cmd::Induct(args) => induct::run(args)?,
-        Cmd::TaskClasses => print_task_classes()?,
-        Cmd::Update => placeholder("update")?,
-        Cmd::Init => placeholder("init")?,
-        Cmd::Tail => placeholder("tail")?,
-        Cmd::Explain => placeholder("explain")?,
-    };
-
-    Ok(CliOutput { exit_code })
-}
-
 pub fn parse_evidence_pair(value: &str) -> Result<(String, String), String> {
-    let (key, value) = value
+    let (key, val) = value
         .split_once('=')
         .ok_or_else(|| "expected evidence in id=value form".to_owned())?;
 
@@ -71,17 +58,5 @@ pub fn parse_evidence_pair(value: &str) -> Result<(String, String), String> {
         return Err("evidence id must not be empty".to_owned());
     }
 
-    Ok((key.to_owned(), value.to_owned()))
-}
-
-fn print_task_classes() -> Result<ExitCode, BanchorError> {
-    output::write_stdout_lines(TaskClass::ALL)?;
-
-    Ok(ExitCode::SUCCESS)
-}
-
-fn placeholder(command_name: &'static str) -> Result<ExitCode, BanchorError> {
-    output::write_stdout_text(format_args!("{PUBLIC_PLACEHOLDER_MESSAGE}: {command_name}"))?;
-
-    Ok(ExitCode::SUCCESS)
+    Ok((key.to_owned(), val.to_owned()))
 }

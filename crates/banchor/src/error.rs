@@ -1,5 +1,3 @@
-use std::io;
-
 use thiserror::Error;
 
 #[derive(Debug, Error)]
@@ -10,44 +8,40 @@ pub enum BanchorError {
     MissionAnchorUnresolved(String),
     #[error("unknown task class: {0}")]
     UnknownTaskClass(String),
-    #[error("unknown induction state: {0}")]
-    UnknownInductionState(String),
     #[error("malformed evidence: {0}")]
     MalformedEvidence(String),
-    #[error("not yet implemented: {0}")]
-    NotYetImplemented(&'static str),
-    #[error("stdout write failed: {0}")]
-    Stdout(io::Error),
-    #[error("stdout pipe closed")]
-    BrokenStdoutPipe,
+    #[error("corpus load failed: {0}")]
+    CorpusLoad(String),
     #[error(transparent)]
-    BsuiteCore(#[from] bsuite_core::BsuiteCoreError),
+    Core(#[from] bsuite_core::BsuiteCoreError),
 }
 
 impl BanchorError {
-    pub fn from_stdout_error(error: io::Error) -> Self {
-        if error.kind() == io::ErrorKind::BrokenPipe {
-            return Self::BrokenStdoutPipe;
+    pub fn is_malformed_input(&self) -> bool {
+        matches!(
+            self,
+            Self::MalformedTaskDescription(_)
+                | Self::MissionAnchorUnresolved(_)
+                | Self::UnknownTaskClass(_)
+                | Self::MalformedEvidence(_)
+        )
+    }
+
+    pub fn into_core(self) -> bsuite_core::BsuiteCoreError {
+        match self {
+            Self::Core(e) => e,
+            Self::CorpusLoad(msg) => bsuite_core::BsuiteCoreError::CorpusDeserializationFailed(msg),
+            other => bsuite_core::BsuiteCoreError::PromptResolution(other.to_string()),
         }
-
-        Self::Stdout(error)
     }
 
-    pub const fn is_reportable(&self) -> bool {
-        !matches!(self, Self::BrokenStdoutPipe)
-    }
-
-    pub const fn exit_code(&self) -> bsuite_core::ExitCode {
+    pub fn exit_code(&self) -> bsuite_core::ExitCode {
         match self {
             Self::MalformedTaskDescription(_)
             | Self::MissionAnchorUnresolved(_)
             | Self::UnknownTaskClass(_)
-            | Self::UnknownInductionState(_)
             | Self::MalformedEvidence(_) => bsuite_core::ExitCode::Usage,
-            Self::BrokenStdoutPipe => bsuite_core::ExitCode::Success,
-            Self::NotYetImplemented(_) | Self::BsuiteCore(_) | Self::Stdout(_) => {
-                bsuite_core::ExitCode::InternalError
-            }
+            Self::CorpusLoad(_) | Self::Core(_) => bsuite_core::ExitCode::InternalError,
         }
     }
 }

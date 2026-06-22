@@ -1,29 +1,14 @@
-use std::str::FromStr;
-
-use banchor::{BanchorError, InductionState};
-use proptest::prelude::*;
+use banchor::InductionState;
 
 const NAMES: [&str; 3] = ["anchored", "unanchored", "malformed"];
 
-proptest! {
-    #[test]
-    fn induction_state_round_trips(index in 0usize..InductionState::ALL.len()) {
-        let state = InductionState::ALL[index];
-        let name = state.to_string();
+#[test]
+fn induction_state_display_names_are_stable_and_unique() {
+    let names: Vec<&str> = InductionState::ALL.iter().map(|s| s.as_str()).collect();
+    assert_eq!(names, NAMES);
 
-        prop_assert_eq!(InductionState::from_str(&name).unwrap(), state);
-        prop_assert!(NAMES.contains(&name.as_str()));
-    }
-
-    #[test]
-    fn unknown_induction_state_is_rejected(name in "[a-z0-9-]{1,32}") {
-        prop_assume!(!NAMES.contains(&name.as_str()));
-
-        prop_assert!(matches!(
-            InductionState::from_str(&name),
-            Err(BanchorError::UnknownInductionState(_))
-        ));
-    }
+    let unique: std::collections::BTreeSet<_> = names.into_iter().collect();
+    assert_eq!(unique.len(), InductionState::ALL.len());
 }
 
 #[test]

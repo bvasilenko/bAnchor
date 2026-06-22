@@ -14,13 +14,27 @@ path = "src/lib.rs"
 name = "banchor"
 path = "src/main.rs"
 
+[[bin]]
+name = "gen-fixture"
+path = "src/bin/gen_fixture.rs"
+
 [dependencies]
-bsuite-core = { git = "https://github.com/bvasilenko/bsuite-core", branch = "main" }
+bsuite-core = { git = "https://github.com/bvasilenko/bCore", tag = "v0.2.0" }
+base64.workspace = true
+chrono.workspace = true
 clap = { version = "4", features = ["derive"] }
+ed25519-dalek.workspace = true
+semver.workspace = true
 serde = { version = "1", features = ["derive"] }
+serde_json.workspace = true
 thiserror.workspace = true
+toml.workspace = true
+ulid.workspace = true
 
 [dev-dependencies]
 assert_cmd = "2"
+httpmock.workspace = true
 predicates = "3"
 proptest = "1"
+serde_json.workspace = true
+tempfile.workspace = true

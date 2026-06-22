@@ -1,8 +1,9 @@
 use serde::{Deserialize, Serialize};
-use std::{fmt, str::FromStr};
+use std::fmt;
 
-use crate::BanchorError;
-
+/// Verdict class for the induction ladder evaluation.
+/// At the fixture-corpus tier only `Unanchored` is emitted at runtime;
+/// `Anchored` becomes reachable once a real evaluation engine ships.
 #[derive(Debug, Clone, Copy, Eq, PartialEq, Ord, PartialOrd, Hash, Serialize, Deserialize)]
 pub enum InductionState {
     Anchored,
@@ -25,17 +26,6 @@ impl InductionState {
 impl fmt::Display for InductionState {
     fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
         formatter.write_str(self.as_str())
-    }
-}
-
-impl FromStr for InductionState {
-    type Err = BanchorError;
-
-    fn from_str(value: &str) -> Result<Self, Self::Err> {
-        Self::ALL
-            .into_iter()
-            .find(|state| state.as_str() == value)
-            .ok_or_else(|| BanchorError::UnknownInductionState(value.to_owned()))
     }
 }
 

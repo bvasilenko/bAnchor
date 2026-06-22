@@ -1,6 +1,7 @@
 use std::str::FromStr;
 
 use banchor::{EvidenceMap, MissionAnchorRef};
+use proptest::prelude::*;
 
 #[test]
 fn mission_anchor_resolution_uses_only_documented_path_prefixes() {
@@ -74,4 +75,27 @@ fn repeated_evidence_ids_use_the_last_value() {
     .unwrap();
 
     assert_eq!(map.as_map()["same"], "second");
+}
+
+proptest! {
+    #[test]
+    fn mission_anchor_alias_round_trips_arbitrary_non_path_strings(
+        s in "[a-zA-Z0-9._-]{1,64}"
+    ) {
+        prop_assume!(!s.starts_with('/'));
+        prop_assume!(!s.starts_with("./"));
+        prop_assume!(!s.starts_with("../"));
+
+        let anchor = MissionAnchorRef::from_str(&s).unwrap();
+        prop_assert!(matches!(anchor, MissionAnchorRef::Alias(_)));
+        prop_assert_eq!(anchor.to_string(), s);
+    }
+
+    #[test]
+    fn mission_anchor_absolute_path_round_trips(suffix in "[a-zA-Z0-9/_.-]{0,32}") {
+        let s = format!("/{suffix}");
+        let anchor = MissionAnchorRef::from_str(&s).unwrap();
+        prop_assert!(matches!(anchor, MissionAnchorRef::Path(_)));
+        prop_assert_eq!(anchor.to_string(), s);
+    }
 }

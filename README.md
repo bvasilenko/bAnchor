@@ -51,6 +51,14 @@ Closed 11-variant `TaskClass` enum. The taxonomy is fixed at this version; widen
 
 `banchor task-classes` prints the full list.
 
+
+
+## Corpus
+
+The v0 prompt corpus is hand-authored fixture material. It seeds the 11 task-class directives and will be replaced by an evolved corpus once the evaluation harness runs and produces entries meeting the empirical-lift threshold. Until then every `banchor induct` invocation returns a fixture directive and exits 1 (UNANCHORED), which is the correct signal at this tier.
+
+Set `BSUITE_UPDATE_BASE_URL` to point `banchor update` at a manifest endpoint when one is available.
+
 ## License
 
 MIT.
